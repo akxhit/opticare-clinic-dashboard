@@ -1,0 +1,1 @@
+ALTER TABLE public.patients ADD COLUMN gender text, ADD COLUMN email text, ADD COLUMN medical_history text;

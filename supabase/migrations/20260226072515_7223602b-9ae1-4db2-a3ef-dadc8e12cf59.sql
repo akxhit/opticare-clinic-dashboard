@@ -1,0 +1,1 @@
+ALTER TABLE public.eye_visits ADD COLUMN next_appointment_date date;

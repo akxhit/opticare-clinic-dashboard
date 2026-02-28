@@ -1,0 +1,356 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 210 30% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 30% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 30% 10%;
+
+    --primary: 174 62% 38%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 20% 95%;
+    --secondary-foreground: 210 30% 10%;
+
+    --muted: 210 15% 93%;
+    --muted-foreground: 210 10% 46%;
+
+    --accent: 174 40% 92%;
+    --accent-foreground: 174 62% 25%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 18% 87%;
+    --input: 210 18% 87%;
+    --ring: 174 62% 38%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 210 30% 10%;
+    --sidebar-foreground: 210 15% 80%;
+    --sidebar-primary: 174 62% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 25% 16%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 210 25% 18%;
+    --sidebar-ring: 174 62% 48%;
+
+    --chart-1: 174 62% 38%;
+    --chart-2: 200 65% 45%;
+    --chart-3: 160 50% 40%;
+    --chart-4: 210 30% 60%;
+    --chart-5: 174 40% 55%;
+  }
+
+  .dark {
+    --background: 210 30% 8%;
+    --foreground: 210 15% 93%;
+    --card: 210 28% 12%;
+    --card-foreground: 210 15% 93%;
+    --popover: 210 28% 12%;
+    --popover-foreground: 210 15% 93%;
+    --primary: 174 62% 48%;
+    --primary-foreground: 210 30% 8%;
+    --secondary: 210 25% 16%;
+    --secondary-foreground: 210 15% 93%;
+    --muted: 210 25% 16%;
+    --muted-foreground: 210 10% 55%;
+    --accent: 174 30% 18%;
+    --accent-foreground: 174 62% 65%;
+    --destructive: 0 62% 40%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 25% 18%;
+    --input: 210 25% 18%;
+    --ring: 174 62% 48%;
+    --sidebar-background: 210 35% 6%;
+    --sidebar-foreground: 210 15% 75%;
+    --sidebar-primary: 174 62% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 30% 12%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 210 30% 12%;
+    --sidebar-ring: 174 62% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  }
+
+  /* Enhanced focus states for accessibility */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Ensure skip-link style if needed */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+/* ─── Modern react-big-calendar overrides ─── */
+.modern-calendar .rbc-toolbar {
+  display: none;
+}
+
+.modern-calendar .rbc-time-view,
+.modern-calendar .rbc-month-view {
+  border: none;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.modern-calendar .rbc-month-view {
+  border: 1px solid hsl(var(--border));
+}
+
+.modern-calendar .rbc-header {
+  background: hsl(var(--muted));
+  border-bottom: 1px solid hsl(var(--border));
+  padding: 8px 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: hsl(var(--muted-foreground));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.modern-calendar .rbc-header + .rbc-header {
+  border-left: 1px solid hsl(var(--border));
+}
+
+.modern-calendar .rbc-time-header-gutter {
+  background: hsl(var(--muted));
+}
+
+.modern-calendar .rbc-today {
+  background: hsl(var(--primary) / 0.04);
+}
+
+.modern-calendar .rbc-off-range-bg {
+  background: hsl(var(--muted) / 0.3);
+}
+
+.modern-calendar .rbc-day-bg + .rbc-day-bg,
+.modern-calendar .rbc-month-row + .rbc-month-row {
+  border-color: hsl(var(--border));
+}
+
+.modern-calendar .rbc-time-content {
+  border-top: 1px solid hsl(var(--border));
+}
+
+.modern-calendar .rbc-time-content > * + * > * {
+  border-left: 1px solid hsl(var(--border));
+}
+
+.modern-calendar .rbc-timeslot-group {
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
+  min-height: 48px;
+}
+
+.modern-calendar .rbc-time-slot {
+  border-top: none;
+}
+
+.modern-calendar .rbc-time-gutter .rbc-timeslot-group {
+  border-bottom: none;
+}
+
+.modern-calendar .rbc-label {
+  font-size: 0.68rem;
+  color: hsl(var(--muted-foreground));
+  padding: 0 8px;
+}
+
+.modern-calendar .rbc-current-time-indicator {
+  background: hsl(var(--primary));
+  height: 2px;
+}
+
+.modern-calendar .rbc-current-time-indicator::before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+}
+
+/* Event styling */
+.modern-calendar .rbc-event {
+  background: hsl(var(--primary));
+  border: none;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  cursor: pointer;
+  box-shadow: 0 1px 3px hsl(var(--primary) / 0.25);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.modern-calendar .rbc-event:hover {
+  box-shadow: 0 3px 8px hsl(var(--primary) / 0.35);
+  transform: translateY(-1px);
+}
+
+.modern-calendar .rbc-event.rbc-selected {
+  background: hsl(var(--primary));
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--primary));
+}
+
+.modern-calendar .rbc-event-label {
+  display: none;
+}
+
+.modern-calendar .rbc-event-content {
+  color: hsl(var(--primary-foreground));
+  font-weight: 500;
+}
+
+.modern-calendar .rbc-show-more {
+  color: hsl(var(--primary));
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: transparent;
+}
+
+/* Day/date number in month view */
+.modern-calendar .rbc-date-cell {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+}
+
+.modern-calendar .rbc-date-cell.rbc-now {
+  font-weight: 700;
+}
+
+.modern-calendar .rbc-date-cell.rbc-now a {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modern-calendar .rbc-off-range {
+  color: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Row segment styling */
+.modern-calendar .rbc-row-segment {
+  padding: 1px 4px;
+}
+
+/* Allday section */
+.modern-calendar .rbc-allday-cell {
+  display: none;
+}
+
+.modern-calendar .rbc-time-header-content > .rbc-row.rbc-row-resource {
+  border-bottom: none;
+}
+
+/* Print styles — prescription only */
+@media print {
+  @page {
+    size: A4;
+    margin: 16mm 14mm;
+  }
+
+  /* Hide everything */
+  html, body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Reveal only prescription */
+  #prescription-section,
+  #prescription-section * {
+    visibility: visible !important;
+  }
+
+  #prescription-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Strip card chrome for print */
+  #prescription-section > div:last-child {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  /* Ensure images print */
+  #prescription-section img {
+    max-width: 100% !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Table styling for print */
+  #prescription-section table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  #prescription-section th,
+  #prescription-section td {
+    border: 1px solid #d1d5db !important;
+    padding: 6px 10px;
+  }
+
+  #prescription-section th {
+    background-color: #f3f4f6 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* No page breaks inside the prescription */
+  #prescription-section {
+    page-break-inside: avoid;
+  }
+}
