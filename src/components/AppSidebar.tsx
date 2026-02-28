@@ -38,7 +38,7 @@ export function AppSidebar() {
         </div>
         {!collapsed && (
           <span className="text-sm font-semibold text-sidebar-accent-foreground">
-            OptiCare Clinic
+            Docprime
           </span>
         )}
       </div>

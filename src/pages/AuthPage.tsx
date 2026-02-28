@@ -96,7 +96,7 @@ export default function AuthPage() {
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
             <span className="text-xl text-primary-foreground">👁</span>
           </div>
-          <h1 className="text-xl font-semibold text-foreground">OptiCare Clinic</h1>
+          <h1 className="text-xl font-semibold text-foreground">Docprime</h1>
           <p className="text-sm text-muted-foreground">
             {mode === "signup" ? "Create your account" : mode === "forgot" ? "Recover your account" : "Sign in to your account"}
           </p>

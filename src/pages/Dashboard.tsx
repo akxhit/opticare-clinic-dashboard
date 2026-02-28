@@ -34,7 +34,7 @@ export default function Dashboard() {
     <div className="space-y-8">
       <header>
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome to OptiCare Patient Management</p>
+        <p className="text-muted-foreground">Welcome to Docprime Patient Management</p>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-3">
