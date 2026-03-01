@@ -1,9 +1,13 @@
 import { format } from "date-fns";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Printer } from "lucide-react";
+import { Printer, MessageSquare, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
+import { toast } from "sonner";
 
 interface PrescriptionProps {
   patient: {
@@ -38,6 +42,7 @@ function fmt(v: number | null | undefined) {
 
 export function Prescription({ patient, visit }: PrescriptionProps) {
   const { user } = useAuth();
+  const [isSharing, setIsSharing] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
@@ -53,10 +58,92 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
     enabled: !!user?.id,
   });
 
+  const handleWhatsAppShare = async () => {
+    const element = document.getElementById("prescription-content");
+    if (!element || !user) return;
+
+    try {
+      setIsSharing(true);
+
+      // Generate Canvas
+      const canvas = await html2canvas(element, {
+        scale: 2, // Higher quality
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      const pdfBlob = pdf.output("blob");
+
+      // Upload to Supabase Storage
+      const fileName = `${user.id}/${patient.name.replace(/\s+/g, '_')}_${format(new Date(), "yyyyMMdd_HHmmss")}.pdf`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("prescriptions")
+        .upload(fileName, pdfBlob, {
+          contentType: "application/pdf",
+          upsert: true,
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get Public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from("prescriptions")
+        .getPublicUrl(fileName);
+
+      // Build WhatsApp Link
+      const phoneNumber = patient.phone?.replace(/\D/g, "");
+      if (!phoneNumber) {
+        toast.error("Patient phone number is missing or invalid");
+        return;
+      }
+
+      const message = encodeURIComponent(
+        `Hello ${patient.name}, here is your digital prescription from ${profile?.clinic_name || "OptiCare Clinic"}:\n\n${publicUrl}`
+      );
+
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+      window.open(whatsappUrl, "_blank");
+
+      toast.success("Prescription generated and WhatsApp opened!");
+    } catch (error: any) {
+      console.error("WhatsApp share error:", error);
+      toast.error(`Failed to share prescription: ${error.message}`);
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
   return (
     <div id="prescription-section">
-      {/* Print button — hidden during print */}
-      <div className="mb-4 flex justify-end print:hidden">
+      {/* Print & Share buttons — hidden during print */}
+      <div className="mb-4 flex justify-end gap-2 print:hidden">
+        <Button
+          variant="outline"
+          onClick={handleWhatsAppShare}
+          disabled={isSharing}
+        >
+          {isSharing ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <MessageSquare className="mr-2 h-4 w-4" />
+          )}
+          Send via WhatsApp
+        </Button>
         <Button onClick={() => window.print()}>
           <Printer className="mr-2 h-4 w-4" />
           Print Prescription
@@ -64,7 +151,7 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
       </div>
 
       {/* Printable content */}
-      <div className="rounded-lg border bg-white p-8 text-gray-900 print:border-none print:shadow-none print:p-0">
+      <div id="prescription-content" className="rounded-lg border bg-white p-8 text-gray-900 print:border-none print:shadow-none print:p-0">
         {/* Clinic Header */}
         <header className="mb-6 border-b border-gray-200 pb-4 flex items-start justify-between">
           <div className="flex-shrink-0">
@@ -108,7 +195,7 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
           </div>
         </div>
 
-        
+
 
         {/* Refraction Table */}
         <table className="mb-6 w-full border-collapse text-sm">
