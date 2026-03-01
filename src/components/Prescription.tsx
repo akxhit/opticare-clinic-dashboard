@@ -79,7 +79,7 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
 
       // Generate Canvas
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 1.5, // Optimized scale for faster generation/upload
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
@@ -150,12 +150,54 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
     }
   };
 
+  const handleFastShare = () => {
+    // Build WhatsApp Link for Text-only summary (Instant)
+    const phoneNumber = patient.phone?.replace(/\D/g, "");
+    if (!phoneNumber) {
+      toast.error("Patient phone number is missing or invalid");
+      return;
+    }
+
+    const finalPhone = phoneNumber.length === 10 ? `91${phoneNumber}` : phoneNumber;
+
+    // Formatting the text message
+    let messageBody = `Hello ${patient.name}, here is your prescription summary from ${profile?.clinic_name || "OptiCare Clinic"}:\n\n`;
+    messageBody += `*Date:* ${format(new Date(visit.visit_date), "MMMM d, yyyy")}\n`;
+
+    if (visit.od_visual_acuity || visit.os_visual_acuity) {
+      messageBody += `*VA:* OD: ${visit.od_visual_acuity || "—"}, OS: ${visit.os_visual_acuity || "—"}\n`;
+    }
+
+    if (visit.diagnosis) {
+      messageBody += `*Diagnosis:* ${visit.diagnosis}\n`;
+    }
+
+    if (visit.next_appointment_date) {
+      messageBody += `\n*Next Appointment:* ${format(new Date(visit.next_appointment_date), "MMMM d, yyyy")}`;
+    }
+
+    const message = encodeURIComponent(messageBody);
+    const whatsappUrl = `https://wa.me/${finalPhone}?text=${message}`;
+    window.open(whatsappUrl, "_blank");
+    toast.success("WhatsApp opened!");
+  };
+
   return (
     <div id="prescription-section">
       {/* Print & Share buttons — hidden during print */}
-      <div className="mb-4 flex justify-end gap-2 print:hidden">
+      <div className="mb-4 flex flex-wrap justify-end gap-2 print:hidden">
         <Button
           variant="outline"
+          size="sm"
+          onClick={handleFastShare}
+          className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+        >
+          <MessageSquare className="mr-2 h-4 w-4" />
+          Fast Share (Text)
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
           onClick={handleWhatsAppShare}
           disabled={isSharing}
         >
@@ -164,11 +206,11 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
           ) : (
             <MessageSquare className="mr-2 h-4 w-4" />
           )}
-          Send via WhatsApp
+          Send PDF
         </Button>
-        <Button onClick={() => window.print()}>
+        <Button size="sm" onClick={() => window.print()}>
           <Printer className="mr-2 h-4 w-4" />
-          Print Prescription
+          Print
         </Button>
       </div>
 
