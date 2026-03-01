@@ -79,10 +79,14 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
 
       // Generate Canvas
       const canvas = await html2canvas(element, {
-        scale: 1.5, // Optimized scale for faster generation/upload
+        scale: 2, // High resolution
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
+        width: 800, // Force desktop width for capture
+        windowWidth: 800, // Ensure layout behaves as desktop
+        scrollX: 0,
+        scrollY: 0,
       });
 
       const imgData = canvas.toDataURL("image/png");
