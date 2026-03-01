@@ -196,7 +196,7 @@ export function PatientsTable() {
         </div>
       </div>
 
-      <div className="rounded-lg border bg-card">
+      <div className="hidden md:block rounded-lg border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
@@ -257,6 +257,67 @@ export function PatientsTable() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="grid gap-4 md:hidden">
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="p-4 rounded-xl border bg-card shadow-sm space-y-3">
+              <Skeleton className="h-5 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+          ))
+        ) : filtered && filtered.length > 0 ? (
+          filtered.map((patient) => (
+            <div
+              key={patient.id}
+              className="relative p-4 rounded-xl border bg-card shadow-sm active:bg-muted transition-colors"
+              onClick={() => navigate(`/patients/${patient.id}`)}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <div className="space-y-1">
+                  <h3 className="font-bold text-lg text-primary">{patient.name}</h3>
+                  <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                    {patient.phone || "No phone"}
+                  </p>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 -mr-1">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenuItem
+                      className="text-destructive focus:text-destructive"
+                      onClick={() => setArchiveTarget({ id: patient.id, name: patient.name })}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Archive
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <div className="pt-3 border-t flex justify-between items-center text-sm font-medium">
+                <span className="text-muted-foreground">Last Visit:</span>
+                <span className="text-foreground">
+                  {patient.last_visit_date
+                    ? format(new Date(patient.last_visit_date), "MMM d, yyyy")
+                    : "Never"}
+                </span>
+              </div>
+              <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="px-2 py-0.5 bg-muted rounded-full">{patient.age} yrs</span>
+                {patient.gender && <span className="px-2 py-0.5 bg-muted rounded-full capitalize">{patient.gender}</span>}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="py-12 text-center text-muted-foreground border rounded-xl bg-muted/20">
+            {search ? "No patients match your search." : "No patients found."}
+          </div>
+        )}
       </div>
 
       <AlertDialog open={!!archiveTarget} onOpenChange={(v) => { if (!v) setArchiveTarget(null); }}>

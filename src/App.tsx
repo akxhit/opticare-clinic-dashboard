@@ -44,13 +44,29 @@ function AppRoutes() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="flex min-h-screen w-full bg-background transition-colors duration-300">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <header className="flex h-14 items-center border-b px-4">
+          {/* Desktop Header */}
+          <header className="hidden md:flex h-14 items-center border-b px-6 bg-background/80 backdrop-blur-md sticky top-0 z-30">
             <SidebarTrigger />
+            <div className="ml-4 flex items-center gap-2">
+              <span className="text-sm font-medium text-muted-foreground">OptiCare Dashboard</span>
+            </div>
           </header>
-          <main className="flex-1 p-6">
+
+          {/* Mobile Header */}
+          <header className="flex md:hidden h-14 items-center justify-between border-b px-4 bg-background/80 backdrop-blur-md sticky top-0 z-30">
+            <div className="flex items-center gap-3">
+              <SidebarTrigger />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white font-bold">
+                👁
+              </div>
+              <span className="font-semibold text-sm">OptiCare</span>
+            </div>
+          </header>
+
+          <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/patients" element={<Patients />} />

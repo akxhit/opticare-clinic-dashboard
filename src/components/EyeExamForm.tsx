@@ -155,7 +155,7 @@ function EyeSection({
             aria-label={`${label} Visual Acuity`}
           />
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor={`${side}-sph`}>Spherical (Sph)</Label>
             <ValidatedInput
@@ -181,7 +181,7 @@ function EyeSection({
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor={`${side}-axis`}>Axis (°)</Label>
             <ValidatedInput
@@ -229,7 +229,7 @@ export function EyeExamForm({ patientId }: { patientId: string }) {
             : undefined,
         };
       }
-    } catch {}
+    } catch { }
     return { od: { ...emptyEye }, os: { ...emptyEye }, diagnosis: "", clinical_notes: "", next_appointment_date: undefined };
   };
 
