@@ -1,7 +1,8 @@
-import { LayoutDashboard, Users, Settings, LogOut, CalendarDays } from "lucide-react";
+import { LayoutDashboard, Users, Settings, LogOut, CalendarDays, Sun, Moon } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "./ThemeProvider";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
@@ -29,6 +30,7 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
 
   return (
     <Sidebar collapsible="icon">
@@ -71,9 +73,23 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-2">
+      <SidebarFooter className="p-2 space-y-2">
         <Button
           variant="ghost"
+          size="sm"
+          className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
+          {theme === "dark" ? (
+            <Sun className="h-4 w-4" />
+          ) : (
+            <Moon className="h-4 w-4" />
+          )}
+          {!collapsed && <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
           className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
           onClick={signOut}
         >
