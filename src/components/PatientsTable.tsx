@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useRef, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -28,7 +28,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Search, MoreHorizontal, Trash2, Download, Loader2 } from "lucide-react";
+import { Search, MoreHorizontal, Trash2, Download, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { AddPatientDialog } from "./AddPatientDialog";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -45,19 +45,52 @@ export function PatientsTable() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  const { data: patients, isLoading } = useQuery({
-    queryKey: ["patients_with_visits"],
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setCurrentPage(1); // Reset to first page on search
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const { data, isLoading, isPlaceholderData } = useQuery({
+    queryKey: ["patients_with_visits", currentPage, debouncedSearch],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const from = (currentPage - 1) * itemsPerPage;
+      const to = from + itemsPerPage - 1;
+
+      let query = supabase
         .from("patients")
-        .select("*, eye_visits(diagnosis)")
-        .eq("is_active", true)
-        .order("created_at", { ascending: false });
+        .select("*, eye_visits(diagnosis)", { count: "exact" })
+        .eq("is_active", true);
+
+      if (debouncedSearch) {
+        // Simple search across name and phone. 
+        // Note: Complex joins for eye_visits diagnosis search are harder in Supabase JS client
+        // for exact server-side filtering without RPC. We'll stick to name/phone for now
+        // to maintain performance, or use a broad filter.
+        query = query.or(`name.ilike.%${debouncedSearch}%,phone.ilike.%${debouncedSearch}%`);
+      }
+
+      const { data: patients, error, count } = await query
+        .order("created_at", { ascending: false })
+        .range(from, to);
+
       if (error) throw error;
-      return data as PatientWithVisits[];
+      return {
+        patients: patients as PatientWithVisits[],
+        count: count || 0
+      };
     },
+    placeholderData: keepPreviousData,
   });
+
+  const patients = data?.patients;
+  const totalCount = data?.count || 0;
 
   const archiveMutation = useMutation({
     mutationFn: async (patientId: string) => {
@@ -133,17 +166,12 @@ export function PatientsTable() {
     }
   };
 
-  const filtered = patients?.filter((p) => {
-    const q = search.toLowerCase();
-    const nameMatch = p.name.toLowerCase().includes(q);
-    const phoneMatch = p.phone?.toLowerCase().includes(q) ?? false;
-    const diagnosisMatch = p.eye_visits?.some(
-      (v) => v.diagnosis?.toLowerCase().includes(q)
-    ) ?? false;
-    return nameMatch || phoneMatch || diagnosisMatch;
-  });
-
-  const dropdownResults = search.length > 0 ? filtered?.slice(0, 6) : [];
+  // For the quick search dropdown, we still use a local filter on the current page's results
+  // but for the main table, we rely on server-side pagination.
+  const dropdownResults = search.length > 0 ? patients?.filter(p =>
+    p.name.toLowerCase().includes(search.toLowerCase()) ||
+    p.phone?.toLowerCase().includes(search.toLowerCase())
+  ).slice(0, 6) : [];
 
   return (
     <div className="space-y-6">
@@ -198,7 +226,7 @@ export function PatientsTable() {
         </div>
       </div>
 
-      <div className="hidden md:block rounded-lg border bg-card">
+      <div className="hidden md:block rounded-lg border bg-card overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -208,16 +236,16 @@ export function PatientsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
+            {isLoading || (isPlaceholderData && !patients) ? (
+              Array.from({ length: itemsPerPage }).map((_, i) => (
                 <TableRow key={i}>
                   <TableCell><Skeleton className="h-4 w-48" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                   <TableCell />
                 </TableRow>
               ))
-            ) : filtered && filtered.length > 0 ? (
-              filtered.map((patient) => (
+            ) : patients && patients.length > 0 ? (
+              patients.map((patient) => (
                 <TableRow key={patient.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/patients/${patient.id}`)}>
                   <TableCell>
                     <span className="font-semibold text-foreground">{patient.name}</span>
@@ -263,15 +291,15 @@ export function PatientsTable() {
 
       {/* Mobile Card View */}
       <div className="grid gap-4 md:hidden">
-        {isLoading ? (
+        {isLoading || (isPlaceholderData && !patients) ? (
           Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="p-4 rounded-xl border bg-card shadow-sm space-y-3">
               <Skeleton className="h-5 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
             </div>
           ))
-        ) : filtered && filtered.length > 0 ? (
-          filtered.map((patient) => (
+        ) : patients && patients.length > 0 ? (
+          patients.map((patient) => (
             <div
               key={patient.id}
               className="relative p-4 rounded-xl border bg-card shadow-sm active:bg-muted transition-colors"
@@ -320,6 +348,40 @@ export function PatientsTable() {
             {search ? "No patients match your search." : "No patients found."}
           </div>
         )}
+      </div>
+
+      {/* Pagination Footer */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between py-4 border-t px-2">
+        <div className="text-sm text-muted-foreground">
+          Showing <span className="font-medium text-foreground">{Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}</span> to{" "}
+          <span className="font-medium text-foreground">{Math.min(currentPage * itemsPerPage, totalCount)}</span> of{" "}
+          <span className="font-medium text-foreground">{totalCount}</span> patients
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1 || isLoading}
+            className="h-9 px-4"
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Previous
+          </Button>
+          <div className="flex items-center justify-center min-w-[32px] text-sm font-medium">
+            {currentPage}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((p) => p + 1)}
+            disabled={currentPage * itemsPerPage >= totalCount || isLoading}
+            className="h-9 px-4"
+          >
+            Next
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
+        </div>
       </div>
 
       <AlertDialog open={!!archiveTarget} onOpenChange={(v) => { if (!v) setArchiveTarget(null); }}>
