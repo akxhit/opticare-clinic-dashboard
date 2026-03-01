@@ -70,13 +70,14 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
         scrollY: 0,
       });
 
-      const imgData = canvas.toDataURL("image/png");
+      const imgData = canvas.toDataURL("image/jpeg", 0.95);
 
-      // Create PDF
+      // Create PDF with internal stream compression
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
         format: "a4",
+        compress: true,
       });
 
       const imgProps = pdf.getImageProperties(imgData);
@@ -101,7 +102,7 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
       const x = (pageWidth - imgWidth) / 2;
       const y = (pageHeight - imgHeight) / 2;
 
-      pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
+      pdf.addImage(imgData, "JPEG", x, y, imgWidth, imgHeight, undefined, "FAST");
       const pdfBlob = pdf.output("blob");
 
       toast.info("Uploading PDF...");
