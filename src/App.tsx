@@ -13,6 +13,7 @@ import SettingsPage from "./pages/SettingsPage";
 import CalendarPage from "./pages/CalendarPage";
 import AuthPage from "./pages/AuthPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import SharePage from "./pages/SharePage";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
@@ -35,6 +36,7 @@ function AppRoutes() {
         <Route path="/login" element={<AuthPage />} />
         <Route path="/auth" element={<Navigate to="/login" replace />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/share" element={<SharePage />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     );
@@ -55,6 +57,7 @@ function AppRoutes() {
               <Route path="/patients/:id" element={<PatientDetails />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
+              <Route path="/share" element={<SharePage />} />
               <Route path="/login" element={<Navigate to="/" replace />} />
               <Route path="/auth" element={<Navigate to="/" replace />} />
               <Route path="*" element={<NotFound />} />

@@ -114,10 +114,8 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
 
       if (uploadError) throw uploadError;
 
-      // Get Public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from("prescriptions")
-        .getPublicUrl(fileName);
+      // Build the Cleaner Public Link (masks Supabase and forces download)
+      const shareUrl = `${window.location.origin}/share?f=${fileName}`;
 
       // Build WhatsApp Link
       const phoneNumber = patient.phone?.replace(/\D/g, "");
@@ -127,12 +125,10 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
         return;
       }
 
-      // Check if phone number has country code, if not prepend "91" (assuming India, or just let user decide)
-      // For now, we'll use it as is, but often users forget the country code.
       const finalPhone = phoneNumber.length === 10 ? `91${phoneNumber}` : phoneNumber;
 
       const message = encodeURIComponent(
-        `Hello ${patient.name}, here is your digital prescription from ${profile?.clinic_name || "OptiCare Clinic"}:\n\n${publicUrl}`
+        `Hello ${patient.name}, here is your digital prescription from ${profile?.clinic_name || "OptiCare Clinic"}:\n\n${shareUrl}`
       );
 
       const whatsappUrl = `https://wa.me/${finalPhone}?text=${message}`;
