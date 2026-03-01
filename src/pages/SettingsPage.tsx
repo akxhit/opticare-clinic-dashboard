@@ -252,7 +252,7 @@ export default function SettingsPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="clinicName">Clinic Name</Label>
-              <Input id="clinicName" placeholder="Docprime Eye Clinic" value={clinicName} onChange={(e) => setClinicName(e.target.value)} />
+              <Input id="clinicName" placeholder="OptiCare Eye Clinic" value={clinicName} onChange={(e) => setClinicName(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="clinicAddress">Clinic Address</Label>

@@ -50,7 +50,7 @@ export default function ResetPasswordPage() {
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
             <span className="text-xl text-primary-foreground">👁</span>
           </div>
-          <h1 className="text-xl font-semibold text-foreground">Docprime</h1>
+          <h1 className="text-xl font-semibold text-foreground">OptiCare Clinic</h1>
           <p className="text-sm text-muted-foreground">Set your new password</p>
         </div>
 
