@@ -13,6 +13,7 @@ import { Eye, Save, CalendarIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { InsertVisit } from "@/types/database";
 
 type EyeFields = { visual_acuity: string; sph: string; cyl: string; axis: string; iop: string };
 
@@ -279,28 +280,30 @@ export function EyeExamForm({ patientId }: { patientId: string }) {
     return [...Object.values(odErrors), ...Object.values(osErrors)].some((e) => e !== null);
   }, [odErrors, osErrors]);
 
-  const toNum = (v: string) => (v === "" ? undefined : Number(v));
+  const toNum = (v: string): number | null => (v === "" ? null : Number(v));
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("eye_visits").insert({
+      const visitData: InsertVisit = {
         patient_id: patientId,
         od_visual_acuity: form.od.visual_acuity || null,
-        od_sph: toNum(form.od.sph) ?? null,
-        od_cyl: toNum(form.od.cyl) ?? null,
-        od_axis: toNum(form.od.axis) ?? null,
-        od_iop: toNum(form.od.iop) ?? null,
+        od_sph: toNum(form.od.sph),
+        od_cyl: toNum(form.od.cyl),
+        od_axis: toNum(form.od.axis),
+        od_iop: toNum(form.od.iop),
         os_visual_acuity: form.os.visual_acuity || null,
-        os_sph: toNum(form.os.sph) ?? null,
-        os_cyl: toNum(form.os.cyl) ?? null,
-        os_axis: toNum(form.os.axis) ?? null,
-        os_iop: toNum(form.os.iop) ?? null,
+        os_sph: toNum(form.os.sph),
+        os_cyl: toNum(form.os.cyl),
+        os_axis: toNum(form.os.axis),
+        os_iop: toNum(form.os.iop),
         diagnosis: form.diagnosis || null,
         clinical_notes: form.clinical_notes || null,
         next_appointment_date: form.next_appointment_date
           ? format(form.next_appointment_date, "yyyy-MM-dd")
           : null,
-      });
+      };
+
+      const { error } = await supabase.from("eye_visits").insert(visitData);
       if (error) throw error;
     },
     onSuccess: () => {

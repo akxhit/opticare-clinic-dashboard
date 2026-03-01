@@ -23,6 +23,7 @@ import {
 import { UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import { InsertPatient } from "@/types/database";
 
 const patientSchema = z.object({
   name: z.string().trim().min(1, "Full name is required").max(100, "Name must be under 100 characters"),
@@ -41,7 +42,7 @@ export function AddPatientDialog() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<PatientForm>({
     name: "",
-    age: "" as unknown as number,
+    age: 0,
     gender: "",
     phone: "",
     email: "",
@@ -91,7 +92,7 @@ export function AddPatientDialog() {
     mutationFn: async (data: z.infer<typeof patientSchema>) => {
       const { data: authData, error: authError } = await supabase.auth.getUser();
       if (authError || !authData.user) throw new Error("You must be logged in to add a patient.");
-      const { error } = await supabase.from("patients").insert({
+      const patientData: InsertPatient = {
         name: data.name,
         age: data.age,
         gender: data.gender,
@@ -100,7 +101,9 @@ export function AddPatientDialog() {
         medical_history: data.medical_history || null,
         last_visit_date: new Date().toISOString().split("T")[0],
         doctor_id: authData.user.id,
-      } as any);
+      };
+
+      const { error } = await supabase.from("patients").insert(patientData);
       if (error) throw error;
     },
     onSuccess: () => {

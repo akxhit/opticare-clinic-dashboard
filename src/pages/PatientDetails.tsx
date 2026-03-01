@@ -13,6 +13,8 @@ import { Prescription } from "@/components/Prescription";
 import { ArchivePatientDialog } from "@/components/ArchivePatientDialog";
 import { BookAppointmentDialog } from "@/components/BookAppointmentDialog";
 
+import { Patient, Visit } from "@/types/database";
+
 export default function PatientDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -26,12 +28,12 @@ export default function PatientDetails() {
         .eq("id", id!)
         .single();
       if (error) throw error;
-      return data;
+      return data as Patient;
     },
     enabled: !!id,
   });
 
-  const { data: visits } = useQuery({
+  const { data: visits } = useQuery<Visit[]>({
     queryKey: ["eye_visits", id],
     queryFn: async () => {
       const { data, error } = await supabase

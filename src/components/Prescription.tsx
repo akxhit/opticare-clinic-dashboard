@@ -9,30 +9,11 @@ import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { toast } from "sonner";
 
+import { Patient, Visit, DoctorProfile } from "@/types/database";
+
 interface PrescriptionProps {
-  patient: {
-    name: string;
-    age: number;
-    gender: string | null;
-    phone: string | null;
-  };
-  visit: {
-    visit_date: string;
-    od_visual_acuity: string | null;
-    od_sph: number | null;
-    od_cyl: number | null;
-    od_axis: number | null;
-    od_iop: number | null;
-    os_visual_acuity: string | null;
-    os_sph: number | null;
-    os_cyl: number | null;
-    os_axis: number | null;
-    os_iop: number | null;
-    diagnosis: string | null;
-    clinical_notes: string | null;
-    next_appointment_date: string | null;
-    created_at: string;
-  };
+  patient: Pick<Patient, "name" | "age" | "gender" | "phone">;
+  visit: Visit;
 }
 
 function fmt(v: number | null | undefined) {
@@ -53,7 +34,7 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
         .eq("id", user!.id)
         .single();
       if (error) throw error;
-      return data as any;
+      return data as DoctorProfile;
     },
     enabled: !!user?.id,
   });

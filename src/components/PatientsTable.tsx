@@ -34,6 +34,8 @@ import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 
+import { Patient, PatientWithVisits } from "@/types/database";
+
 export function PatientsTable() {
   const [search, setSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
@@ -53,7 +55,7 @@ export function PatientsTable() {
         .eq("is_active", true)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      return data as PatientWithVisits[];
     },
   });
 
@@ -61,7 +63,7 @@ export function PatientsTable() {
     mutationFn: async (patientId: string) => {
       const { error } = await supabase
         .from("patients")
-        .update({ is_active: false } as any)
+        .update({ is_active: false })
         .eq("id", patientId);
       if (error) throw error;
     },
@@ -71,7 +73,7 @@ export function PatientsTable() {
       toast({ title: "Patient archived successfully" });
       setArchiveTarget(null);
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast({ title: "Failed to archive patient", description: error.message, variant: "destructive" });
     },
   });
@@ -94,14 +96,14 @@ export function PatientsTable() {
 
       const headers = ["Name", "Age", "Gender", "Phone", "Email", "Medical History", "Registration Date"];
 
-      const escapeCsvField = (field: any) => {
+      const escapeCsvField = (field: string | number | boolean | null | undefined) => {
         if (field === null || field === undefined || field === "") return '""';
         const str = String(field);
         const escapedStr = str.replace(/"/g, '""');
         return `"${escapedStr}"`;
       };
 
-      const rows = data.map((p) => [
+      const rows = data.map((p: Patient) => [
         escapeCsvField(p.name),
         escapeCsvField(p.age),
         escapeCsvField(p.gender),
@@ -135,8 +137,8 @@ export function PatientsTable() {
     const q = search.toLowerCase();
     const nameMatch = p.name.toLowerCase().includes(q);
     const phoneMatch = p.phone?.toLowerCase().includes(q) ?? false;
-    const diagnosisMatch = (p.eye_visits as any[])?.some(
-      (v: any) => v.diagnosis?.toLowerCase().includes(q)
+    const diagnosisMatch = p.eye_visits?.some(
+      (v) => v.diagnosis?.toLowerCase().includes(q)
     ) ?? false;
     return nameMatch || phoneMatch || diagnosisMatch;
   });

@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CalendarIcon, Plus } from "lucide-react";
+import { Patient, InsertAppointment } from "@/types/database";
 
 interface BookAppointmentDialogProps {
   /** Pre-selected patient id (from Patient Details page) */
@@ -59,20 +60,22 @@ export function BookAppointmentDialog({
         .eq("is_active", true)
         .order("name");
       if (error) throw error;
-      return data;
+      return data as Pick<Patient, "id" | "name">[];
     },
     enabled: open && !patientId,
   });
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("appointments").insert({
+      const appointment: InsertAppointment = {
         doctor_id: user!.id,
         patient_id: selectedPatientId,
         appointment_date: format(date!, "yyyy-MM-dd"),
         appointment_time: time,
         reason: reason || null,
-      });
+      };
+
+      const { error } = await supabase.from("appointments").insert(appointment);
       if (error) throw error;
     },
     onSuccess: () => {
