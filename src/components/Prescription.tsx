@@ -80,10 +80,28 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
       });
 
       const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
 
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      // Calculate dimensions with a 10mm margin for a clean look
+      const margin = 10;
+      const maxWidth = pageWidth - (margin * 2);
+      const maxHeight = pageHeight - (margin * 2);
+
+      let imgWidth = maxWidth;
+      let imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+
+      // If height is too much, scale down further to fit page
+      if (imgHeight > maxHeight) {
+        imgHeight = maxHeight;
+        imgWidth = (imgProps.width * imgHeight) / imgProps.height;
+      }
+
+      // Calculate centering offsets
+      const x = (pageWidth - imgWidth) / 2;
+      const y = (pageHeight - imgHeight) / 2;
+
+      pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
       const pdfBlob = pdf.output("blob");
 
       toast.info("Uploading PDF...");
