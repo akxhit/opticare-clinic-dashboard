@@ -190,7 +190,7 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
           variant="outline"
           size="sm"
           onClick={handleFastShare}
-          className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+          className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100 dark:bg-green-950/30 dark:text-green-400 dark:border-green-900 dark:hover:bg-green-900/50 transition-all font-medium"
         >
           <MessageSquare className="mr-2 h-4 w-4" />
           Fast Share (Text)
@@ -200,6 +200,7 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
           size="sm"
           onClick={handleWhatsAppShare}
           disabled={isSharing}
+          className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900 dark:hover:bg-blue-900/50 transition-all font-medium"
         >
           {isSharing ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -208,7 +209,7 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
           )}
           Send PDF
         </Button>
-        <Button size="sm" onClick={() => window.print()}>
+        <Button size="sm" onClick={() => window.print()} className="font-medium">
           <Printer className="mr-2 h-4 w-4" />
           Print
         </Button>
