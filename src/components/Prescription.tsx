@@ -62,12 +62,24 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
     const element = document.getElementById("prescription-content");
     if (!element || !user) return;
 
+    // Open the window IMMEDIATELY to avoid popup blockers
+    // Some browsers block window.open if it happens after an async wait (like html2canvas)
+    const whatsappWindow = window.open("", "_blank");
+    if (!whatsappWindow) {
+      toast.error("Popup blocked! Please allow popups for this site to share via WhatsApp.");
+      return;
+    }
+
+    // Set a loading message in the new window
+    whatsappWindow.document.write("<p style='font-family:sans-serif; text-align:center; margin-top:50px;'>Generating prescription PDF... Please wait.</p>");
+
     try {
       setIsSharing(true);
+      toast.info("Generating PDF...");
 
       // Generate Canvas
       const canvas = await html2canvas(element, {
-        scale: 2, // Higher quality
+        scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
@@ -89,6 +101,8 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
       const pdfBlob = pdf.output("blob");
 
+      toast.info("Uploading PDF...");
+
       // Upload to Supabase Storage
       const fileName = `${user.id}/${patient.name.replace(/\s+/g, '_')}_${format(new Date(), "yyyyMMdd_HHmmss")}.pdf`;
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -108,20 +122,28 @@ export function Prescription({ patient, visit }: PrescriptionProps) {
       // Build WhatsApp Link
       const phoneNumber = patient.phone?.replace(/\D/g, "");
       if (!phoneNumber) {
+        whatsappWindow.close();
         toast.error("Patient phone number is missing or invalid");
         return;
       }
+
+      // Check if phone number has country code, if not prepend "91" (assuming India, or just let user decide)
+      // For now, we'll use it as is, but often users forget the country code.
+      const finalPhone = phoneNumber.length === 10 ? `91${phoneNumber}` : phoneNumber;
 
       const message = encodeURIComponent(
         `Hello ${patient.name}, here is your digital prescription from ${profile?.clinic_name || "OptiCare Clinic"}:\n\n${publicUrl}`
       );
 
-      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
-      window.open(whatsappUrl, "_blank");
+      const whatsappUrl = `https://wa.me/${finalPhone}?text=${message}`;
 
-      toast.success("Prescription generated and WhatsApp opened!");
+      // Update the already opened window
+      whatsappWindow.location.href = whatsappUrl;
+
+      toast.success("Prescription shared successfully!");
     } catch (error: any) {
       console.error("WhatsApp share error:", error);
+      whatsappWindow?.close();
       toast.error(`Failed to share prescription: ${error.message}`);
     } finally {
       setIsSharing(false);
