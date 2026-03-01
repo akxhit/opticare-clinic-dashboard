@@ -6,20 +6,20 @@
 
 @layer base {
   :root {
-    --background: 210 40% 100%; /* Pure White */
-    --foreground: 222 47% 11%; /* Slate-900 */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 222.2 84% 4.9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 221 83% 53%; /* Blue-600 */
-    --primary-foreground: 210 40% 100%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%; /* Slate-100 */
-    --secondary-foreground: 222 47% 11.2%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
@@ -30,59 +30,59 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%; /* Slate-200 */
+    --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221 83% 53%;
+    --ring: 221.2 83.2% 53.3%;
 
-    --radius: 0.6rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 222 47% 11%; /* Slate-900 */
-    --sidebar-foreground: 215 20% 65%;
-    --sidebar-primary: 221 83% 53%;
+    --sidebar-background: 222.2 47.4% 11.2%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 221.2 83.2% 53.3%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent: 217.2 32.6% 17.5%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 221 83% 53%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 221.2 83.2% 53.3%;
   }
 
   .dark {
-    --background: 222 47% 11%; /* Slate-900 */
-    --foreground: 210 40% 98%; /* Slate-50 */
+    --background: 222.2 47.4% 11.2%;
+    --foreground: 210 40% 98%;
 
-    --card: 222 47% 15%; /* Slate-800 approx */
+    --card: 222.2 47.4% 15%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222 47% 11%;
+    --popover: 222.2 47.4% 11.2%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 221 83% 53%; /* Blue-600 */
-    --primary-foreground: 210 40% 100%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 217 33% 17%;
+    --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217 33% 17%;
+    --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 221 83% 53%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
 
-    --sidebar-background: 222 47% 10%;
-    --sidebar-foreground: 215 20% 65%;
-    --sidebar-primary: 221 83% 53%;
+    --sidebar-background: 222.2 47.4% 11.2%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent: 217.2 32.6% 17.5%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 221 83% 53%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 224.3 76.3% 48%;
   }
 }
 
@@ -93,7 +93,7 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
   }
 
   /* Enhanced focus states for accessibility */
@@ -139,7 +139,7 @@
   letter-spacing: 0.05em;
 }
 
-.modern-calendar .rbc-header + .rbc-header {
+.modern-calendar .rbc-header+.rbc-header {
   border-left: 1px solid hsl(var(--border));
 }
 
@@ -155,8 +155,8 @@
   background: hsl(var(--muted) / 0.3);
 }
 
-.modern-calendar .rbc-day-bg + .rbc-day-bg,
-.modern-calendar .rbc-month-row + .rbc-month-row {
+.modern-calendar .rbc-day-bg+.rbc-day-bg,
+.modern-calendar .rbc-month-row+.rbc-month-row {
   border-color: hsl(var(--border));
 }
 
@@ -164,7 +164,7 @@
   border-top: 1px solid hsl(var(--border));
 }
 
-.modern-calendar .rbc-time-content > * + * > * {
+.modern-calendar .rbc-time-content>*+*>* {
   border-left: 1px solid hsl(var(--border));
 }
 
@@ -279,7 +279,7 @@
   display: none;
 }
 
-.modern-calendar .rbc-time-header-content > .rbc-row.rbc-row-resource {
+.modern-calendar .rbc-time-header-content>.rbc-row.rbc-row-resource {
   border-bottom: none;
 }
 
@@ -291,7 +291,8 @@
   }
 
   /* Hide everything */
-  html, body {
+  html,
+  body {
     background: white !important;
     color: black !important;
     font-size: 11pt !important;
@@ -320,7 +321,7 @@
   }
 
   /* Strip card chrome for print */
-  #prescription-section > div:last-child {
+  #prescription-section>div:last-child {
     border: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
